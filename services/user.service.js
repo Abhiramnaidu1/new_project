@@ -14,6 +14,7 @@ service.getById = getById;
 service.create = create;
 service.update = update;
 service.delete = _delete;
+service.verifyToken = verifytoken;
 
 module.exports = service;
 
@@ -24,8 +25,14 @@ function authenticate(username, password) {
         if (err) deferred.reject(err.name + ': ' + err.message);
 
         if (user && bcrypt.compareSync(password, user.hash)) {
+          if (user.state=='active'){
             // authentication successful
             deferred.resolve(jwt.sign({ sub: user._id }, config.secret));
+          }
+            else{
+                deferred.resolve();
+            }
+
         } else {
             // authentication failed
             deferred.resolve();
@@ -81,8 +88,8 @@ function create(userParam) {
             user,
             function (err, doc) {
                 if (err) deferred.reject(err.name + ': ' + err.message);
+                deferred.resolve(doc);
 
-                deferred.resolve();
             });
     }
 
@@ -153,4 +160,26 @@ function _delete(_id) {
         });
 
     return deferred.promise;
+}
+function verifytoken(_id){
+  var deferred = Q.defer();
+
+// validation
+
+    // fields to update
+    var set = {
+        state:'active'
+    };
+    db.users.update(
+        { _id: mongo.helper.toObjectID(_id) },
+        { $set: set },
+        function (err, doc) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+        });
+
+
+return deferred.promise;
+
 }
