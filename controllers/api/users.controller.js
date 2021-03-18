@@ -9,6 +9,7 @@ router.post('/register', registerUser);
 router.get('/current', getCurrentUser);
 router.put('/:_id', updateUser);
 router.delete('/:_id', deleteUser);
+router.get('/verifytoken/:token',verifyToken);
 
 module.exports = router;
 
@@ -30,9 +31,13 @@ function authenticateUser(req, res) {
 
 function registerUser(req, res) {
     userService.create(req.body)
-        .then(function () {
-            res.sendStatus(200);
+        .then(function (obj) {
+          console.log('1==============================================================',obj,"=============================================================");
+
+            res.send(obj);
+
         })
+
         .catch(function (err) {
             res.status(400).send(err);
         });
@@ -82,4 +87,15 @@ function deleteUser(req, res) {
         .catch(function (err) {
             res.status(400).send(err);
         });
+}
+
+function verifyToken(req,res){
+    var userId = req.params.token
+  userService.verifyToken(userId)
+  .then(function () {
+      res.status(200).redirect('/login');
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+  });
 }
