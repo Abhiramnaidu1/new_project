@@ -4,6 +4,8 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var Q = require('q');
 var mongo = require('mongoskin');
+var generator = require('generate-password');
+const nodemailer = require('nodemailer');
 var db = mongo.db(config.connectionString, { native_parser: true });
 db.bind('users');
 
@@ -15,6 +17,7 @@ service.create = create;
 service.update = update;
 service.delete = _delete;
 service.verifyToken = verifytoken;
+service.reset=reset;
 
 module.exports = service;
 
@@ -27,7 +30,9 @@ function authenticate(username, password) {
         if (user && bcrypt.compareSync(password, user.hash)) {
           if (user.state=='active'){
             // authentication successful
+            console.log(jwt.sign)
             deferred.resolve(jwt.sign({ sub: user._id }, config.secret));
+
           }
             else{
                 deferred.resolve();
@@ -182,4 +187,56 @@ function verifytoken(_id){
 
 return deferred.promise;
 
+}
+
+function reset(username){
+  var deferred = Q.defer();
+   var _id="";
+db.users.findOne({ username: username }, function (err, user) {
+    if (err) deferred.reject(err.name + ': ' + err.message);
+      _id=user._id;
+});
+let password = generator.generate({
+length: 10,
+numbers: true
+});
+
+
+console.log(password);
+
+
+var set={};
+    // fields to update
+    set.hash = bcrypt.hashSync(password, 10);
+
+
+    db.users.update(
+        { username: username },
+        { $set: set },
+        function (err, doc) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+          }
+        )
+        var smtpTrans = nodemailer.createTransport({
+           service: 'Gmail',
+           auth: {
+            user: 'webprogram1234@gmail.com',
+            pass: 'Abc@1234'
+          }
+        });
+        console.log(_id);
+        console.log(password);
+        smtpTrans.sendMail({
+          from: 'webprogram1234@gmail.com',
+          to: username,
+          subject:'Forgot Password',
+          text:'Hi \n\n'+"Your new password is :\n\n" +
+            password.toString()+ '\n\n'
+});
+
+
+
+return deferred.promise;
 }
