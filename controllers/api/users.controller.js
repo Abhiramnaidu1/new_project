@@ -2,7 +2,7 @@ var config = require('config.json');
 var express = require('express');
 var router = express.Router();
 var userService = require('services/user.service');
-
+var elastic =require('elastic/elastic.functions.js')
 // routes
 router.post('/authenticate', authenticateUser);
 router.post('/register', registerUser);
@@ -10,6 +10,12 @@ router.get('/current', getCurrentUser);
 router.put('/:_id', updateUser);
 router.delete('/:_id', deleteUser);
 router.get('/verifytoken/:token',verifyToken);
+router.post('/resetpassword', reset_password);
+router.get('/reset', function (req, res) {
+    res.render('reset');
+});
+router.get('/search',searchTitles)
+
 
 module.exports = router;
 
@@ -32,7 +38,6 @@ function authenticateUser(req, res) {
 function registerUser(req, res) {
     userService.create(req.body)
         .then(function (obj) {
-          console.log('1==============================================================',obj,"=============================================================");
 
             res.send(obj);
 
@@ -94,6 +99,29 @@ function verifyToken(req,res){
   userService.verifyToken(userId)
   .then(function () {
       res.status(200).redirect('/login');
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+  });
+}
+
+function reset_password(req,res) {
+  var userId = req.body.username;
+userService.reset(userId)
+.then(function () {
+    res.status(200);
+})
+.catch(function (err) {
+    res.status(400).send(err);
+});
+
+}
+
+function searchTitles(req,res){
+  var titlename= req.body.title
+  elastic.searchTitles(titlename)
+  .then(function () {
+      res.status(200);
   })
   .catch(function (err) {
       res.status(400).send(err);
