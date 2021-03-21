@@ -25,6 +25,8 @@
                 controllerAs: 'vm',
                 data: { activeTab: 'account' }
             });
+
+
     }
 
     function run($http, $rootScope, $window) {
