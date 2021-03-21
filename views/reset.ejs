@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+<div class="form-container">
+    <h2>Forgot Password</h2>
+    <% if(locals.error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <% if(locals.success) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" value="<%= locals.username || '' %>" class="form-control" />
+</div>
+        <div class="form-group">
+            <button type="button" onclick="reset()" class="btn btn-primary">Submit</button>
+        </div>
+
+
+    </div>
+    <script type="text/javascript">
+
+          function reset(){
+      var username = document.getElementById("username").value;
+      var userObj={
+        'username':username
+
+      }
+      var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            window.location.href='/login';
+            //document.getElementById("demo").innerHTML = this.responseText;
+            console.log(this.responseText);
+          }
+    };
+
+        xhttp.open("POST", "/api/users/resetpassword", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify(userObj));
+
+}
+
+    </script>
+<%- include('partials/footer') %>
