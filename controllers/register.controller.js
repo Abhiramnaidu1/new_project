@@ -35,7 +35,7 @@ router.post('/', function (req, res) {
         }
 
         // return to login page with success message
-        req.session.success = 'Check your mail';
+        req.session.success = 'User Registered, Check your mail';
         var smtpTrans = nodemailer.createTransport({
            service: 'Gmail',
            auth: {
@@ -48,7 +48,7 @@ router.post('/', function (req, res) {
           from: 'webprogram1234@gmail.com',
           to: req.body.username,
           subject:'Account confirmation',
-          text:'Hi'+req.body.firstName+'\n\n'+'To confirm email press below link :\n\n' +
+          text:'Hi '+req.body.firstName+'\n\n'+'To confirm email press below link :\n\n' +
             'http://localhost:8000/api/users/verifytoken/' +body.insertedIds[0] + '\n\n',
 
         });
