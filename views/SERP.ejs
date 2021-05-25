@@ -1,0 +1,173 @@
+<%- include('partials/header') %>
+<div class="form-container">
+  <div align="right" class="form-group">
+
+      <button class="btn btn-info"> <a href="/register"  >Register </a></button>
+      <button class="btn btn-warning" type="button">  <a href="/login"  >Login</a></button>
+  </div>
+
+    <h2>Search Engine</h2>
+    <% if(locals.error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <% if(locals.success) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+
+        <div class="form-group">
+
+            <input type="text" placeholder="search a book" id="title" class="form-control" />
+            <img onclick="startSearch()" src="//i.imgur.com/cHidSVu.gif" />
+            <button type="button" class="btn btn-primary" onclick="searchTitles()" name="button">Go</button>
+        </div>
+        </div>
+
+<div class="col-lg-12 doc-middle-content">
+  <strong>
+  <div id="titlename" class="titles">
+
+  </div>
+  <div class="count">
+
+  </div>
+
+  <p>Matching Results</p>
+
+
+
+<table id="example" class="display " style="width:100%">
+<thead>
+<tr>
+
+  <td>Title</td>
+  <td>Author</td>
+  <td>Date Issued</td>
+</tr>
+</thead>
+        <tbody class="results" >
+
+
+
+</tbody>
+</table>
+
+
+
+
+
+  </div>
+
+
+
+<script type="text/javascript">
+  function startSearch() {
+
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+      var recognition = new webkitSpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function(e) {
+        document.getElementById('title').value
+                                 = e.results[0][0].transcript;
+        recognition.stop();
+        // document.getElementById('title').submit;
+        searchTitles();
+      };
+
+      recognition.onerror = function(e) {
+        recognition.stop();
+
+      }
+
+    }
+  }
+    window.onload=  function searchTitles(){
+
+    var title = localStorage.getItem('title');
+
+    console.log('serp',title);
+    var userObj={
+      'title': title
+
+    }
+    var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // window.location.href='/index';
+           // document.getElementById("demo").innerHTML = this.responseText;
+          console.log(this.responseText);
+          var response=JSON.parse(this.responseText);
+          var hits=response.hits.hits;
+          var results=document.getElementsByClassName('results')[0];
+
+          var titles = document.getElementsByClassName('titles')[0];
+          titles.innerHTML='<p> searching for: '+userObj.title+'</p>';
+          var k=1;
+          var count=response.hits.total.value;
+          var counts=document.getElementsByClassName('count')[0]
+          counts.setAttribute('class','item');
+          counts.innerHTML='<p>'+'Total matches:'+count+'</p>';
+
+          for (var i in hits ){
+
+            var tr=document.createElement('tr');
+            console.log(userObj.title);
+
+            tr.setAttribute('class','dataTable');
+            var titlename = userObj.title;
+
+
+            var patt = new RegExp(titlename, "gi");
+            console.log(patt)
+            var dummy='<td>'+'<a href=/api/users/getbook/'+hits[i]._id+'>'+hits[i]._source.title+'\n'+'</a></td> <td>'+hits[i]._source.contributor_author+'</td><td> '+hits[i]._source.date_issued+'</td>';
+            dummy=dummy.replace(patt,"<mark>"+userObj.title+"</mark>");
+               tr.innerHTML = dummy;
+
+
+            results.appendChild(tr);
+
+
+
+      k+=1;
+       }
+pagination()
+     }
+
+
+  };
+
+
+      xhttp.open("GET", "/api/users/search?title="+title, true);
+     xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+
+
+
+}
+
+function pagination() {
+    $('#example').DataTable();
+    response: true;
+    searching : false;
+    pagingType: "full_numbers"
+} ;
+
+
+function searchTitles(){
+  var Title = document.getElementById("title").value;
+var titlestrip = Title.replace(/(<([^>]+)>)/gi, "");
+localStorage.setItem('title',titlestrip);
+   window.location.href='/api/users/serp';
+ }
+
+
+
+</script>
+
+<%- include('partials/footer') %>

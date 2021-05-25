@@ -1,0 +1,113 @@
+ <%- include('partials/header') %>
+<div class="row m-5">
+    <div class="p-5">
+
+<h2><strong>Favorite Books</strong></h2>
+        <div class="form-group">
+          <div class="col-lg-12 favbooks"> </div>
+
+
+</div>
+
+</div>
+
+</div>
+<mark>
+<table id="example" class="display " style="width:100%">
+<thead>
+<tr>
+
+  <td>Title</td>
+  <td>Author</td>
+  <td>Date Issued</td>
+  <td>Save document</td>
+</tr>
+</thead>
+        <tbody  class="results">
+
+
+
+
+</tbody>
+</table>
+</mark>
+<button type="button" class="btn btn-info" onclick="window.history.back()" name="button">back</button>
+<script type="text/javascript">
+
+
+window.onload=function favbook(){
+  var results=document.getElementsByClassName('results')[0];
+    var userdetails = JSON.parse(localStorage.getItem("userdetails"));
+results.innerHTML="";
+  for (i in userdetails.favbook){
+   var favbook = userdetails.favbook[i].text;
+
+results.innerHTML+=favbook
+
+   console.log(favbook)
+   //results.appendChild(favbook);
+    i+=1
+  }
+  pagination();
+}
+
+function removebook(id){
+  var fulltitle = document.getElementById(id).innerHTML
+  var userdetails = JSON.parse(localStorage.getItem('userdetails'));
+  var uid = userdetails._id;
+  var bookid =id;
+  console.log(userdetails)
+
+
+  var userobj ={
+  bookdetails : fulltitle,
+  id :uid,
+  bookid: bookid
+
+
+  }
+  console.log(userobj);
+
+
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+var favList=[];
+    for (i in userdetails.favbook){
+     var favbook = userdetails.favbook[i].id;
+     if(favbook!=id){
+       favList.push(userdetails.favbook[i])
+     }
+    }
+    userdetails.favbook=favList;
+    localStorage.setItem('userdetails',JSON.stringify(userdetails));
+   userdetails = JSON.parse(localStorage.getItem("userdetails"));
+   var results=document.getElementsByClassName('results')[0];
+    results.innerHTML="";
+    for (i in userdetails.favbook){
+    var favbook = userdetails.favbook[i].text;
+
+    results.innerHTML+=favbook
+
+    console.log(favbook)
+
+    }
+    pagination();
+
+
+  }
+  }
+  xhttp.open("POST", "/api/users/removebook", true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+
+  xhttp.send(JSON.stringify(userobj));
+}
+
+function pagination() {
+    $('#example').DataTable();
+    response: true;
+    searching : false;
+    pagingType: "full_numbers"
+} ;
+</script>

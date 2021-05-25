@@ -1,0 +1,61 @@
+<%- include('partials/header') %>
+<div class="row m-5">
+    <div class="p-5">
+
+<h2><strong>Add Book</strong></h2>
+        <div class="form-group">
+
+            <strong >Title: </strong><input type="text" required="true" id="Title" name="" value=""><br><br>
+            <strong>Author: </strong><input type="text"  required="true" id="author" name="" value=""><br><br>
+            <strong>Publisher : </strong><input type="text"  required="true"  id="publisher" name="" value=""><br><br>
+            <strong>Department : </strong><input type="text"  required="true" id="Department" name="" value=""><br><br>
+            <strong>Date Issued : </strong><input type="date" required="true"  id="Date_Issued" name="" value=""><br><br>
+            <strong>Advisor : </strong><input type="text" name="" id="advisor" value=""><br><br>
+            <strong>Degree Level: </strong><input type="text" id="degree_level" name="" value=""><br><br>
+            <strong>Abstract : </strong><input type="text" class="form-control" id="Abstract" name="" value=""><br><br>
+
+<button type="button" class="btn btn-info" onclick="create()" name="button">Submit</button>
+<button type="button" class="btn btn-info" onclick="window.history.back()" name="button">back</button>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+  function create() {
+    var Title = document.getElementById('Title').value;
+    var author = document.getElementById('author').value;
+    var publisher =document.getElementById('publisher').value;
+     var department =document.getElementById('Department').value;
+    var date_issued =document.getElementById('Date_Issued').value;
+    var advisor =document.getElementById('advisor').value;
+    var degree_level =document.getElementById('degree_level').value;
+    var abstract =document.getElementById('Abstract').value;
+    var userobj={
+      'Title' : Title,
+      'author' : author,
+      'publisher' : publisher,
+      'department' : department,
+      'date_issued' : date_issued,
+      'advisor' : advisor,
+      'degree_level' : degree_level,
+      'abstract' : abstract
+    };
+    console.log(userobj);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+
+        //document.getElementById("demo").innerHTML = this.responseText;
+        console.log(this.responseText);
+      }
+    };
+
+  xhttp.open("POST", "/api/users/create", true);
+ xhttp.setRequestHeader("Content-type", "application/json");
+xhttp.send(JSON.stringify(userobj));
+alert('Book Added')
+window.location.reload(1)
+}
+</script>

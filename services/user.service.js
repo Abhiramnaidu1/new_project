@@ -8,6 +8,7 @@ var generator = require('generate-password');
 const nodemailer = require('nodemailer');
 var db = mongo.db(config.connectionString, { native_parser: true });
 db.bind('users');
+db.bind('favbook');
 
 var service = {};
 
@@ -18,8 +19,44 @@ service.update = update;
 service.delete = _delete;
 service.verifyToken = verifytoken;
 service.reset=reset;
-
+service.savebook=savebook;
+service.removebook=removebook;
 module.exports = service;
+
+function savebook(userParam) {
+  var deferred = Q.defer();
+    // fields to update
+    var bookinfo =  userParam.bookdetails;
+   var _id = userParam.id;
+    db.users.update(
+        { _id: mongo.helper.toObjectID(_id) },
+        { $addToSet: { favbook:  bookinfo}},
+        function (err, doc) {
+          console.log(err)
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+        });
+        return deferred.promise;
+}
+
+function removebook(userParam) {
+  var deferred = Q.defer();
+    // fields to update
+    var bookinfo =  userParam.bookdetails;
+   var _id = userParam.id;
+   var bookid=userParam.bookid;
+    db.users.update(
+        { _id: mongo.helper.toObjectID(_id) },
+        { $pull: { favbook: {id: bookid}}},
+        function (err, doc) {
+          console.log(err)
+            if (err) deferred.reject(err.name + ': ' + err.message);
+
+            deferred.resolve();
+        });
+        return deferred.promise;
+}
 
 function authenticate(username, password) {
     var deferred = Q.defer();

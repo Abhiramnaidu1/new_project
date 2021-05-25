@@ -1,26 +1,33 @@
 <%- include('partials/header') %>
 <div class="form-container">
-    <h2>Login</h2>
-    <% if(locals.error) { %>
-        <div class="alert alert-danger"><%= error %></div>
-    <% } %>
-    <% if(locals.success) { %>
-        <div class="alert alert-success"><%= success %></div>
-    <% } %>
-    <form method="post">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username" value="<%= locals.username || '' %>" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" class="form-control" />
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Login</button>
-            <button class="btn btn-info"> <a href="/register"  >Register </a></button>
-            <button class="btn btn-warning" type="button">  <a href="api/users/reset"  >Forgot password</a></button>
-        </div>
-    </form>
+  <h2>Login</h2>
+  <% if(locals.error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+  <% if(locals.success) { %>
+  <div class="alert alert-success"><%= success %></div>
+  <% } %>
+  <form method="post" id="login_form">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" value="<%= locals.username || '' %>" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" class="form-control" />
+    </div>
+    <div class="form-group">
+<div class="col-sm-offset-2 col-sm-10">
+
+
 </div>
+    </div>
+    <div class="form-group">
+      <button  class="btn btn-primary" type="submit" >Login</button>
+      <button class="btn btn-info"> <a href="/register">Register </a></button>
+      <button class="btn btn-warning" type="button"> <a href="api/users/reset">Forgot password</a></button>
+    </div>
+  </form>
+</div>
+
 <%- include('partials/footer') %>
