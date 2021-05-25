@@ -16,8 +16,10 @@
             // get current user
             UserService.GetCurrent().then(function (user) {
                 vm.user = user;
+                console.log(vm.user);
+                localStorage.setItem('userdetails',JSON.stringify(vm.user));
             });
         }
     }
 
-})();
+})(); 

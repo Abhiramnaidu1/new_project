@@ -2,7 +2,9 @@ var config = require('config.json');
 var express = require('express');
 var router = express.Router();
 var userService = require('services/user.service');
-var elastic =require('elastic/elastic.functions.js')
+var elastic =require('elastic/elastic.functions.js');
+var check = require('validator').check;
+var sanitize = require('validator').sanitize;
 // routes
 router.post('/authenticate', authenticateUser);
 router.post('/register', registerUser);
@@ -15,9 +17,46 @@ router.get('/reset', function (req, res) {
     res.render('reset');
 });
 router.get('/search',searchTitles)
-
-
+router.get('/serp',serp)
+router.get('/initial',initial)
+router.get('/getbook/:_id',getTitle)
+router.post('/advsearch',advsearch)
+router.get('/upload',upload)
+router.post('/create',create)
+router.post('/comment',comment)
+router.post('/like',like)
+router.post('/unlike',unlike)
+router.post('/newcomment',newcomment)
+router.get('/favbook',favbook)
+router.post('/savebook',savebook)
+router.post('/removebook',removebook)
+ // router.get('/bookinfo',bookinfo)
 module.exports = router;
+
+function removebook(req, res) {
+    userService.removebook(req.body)
+        .then(function (obj) {
+
+            res.send(obj);
+
+        })
+
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
+function savebook(req, res) {
+    userService.savebook(req.body)
+        .then(function (obj) {
+
+            res.send(obj);
+
+        })
+
+        .catch(function (err) {
+            res.status(400).send(err);
+        });
+}
 
 function authenticateUser(req, res) {
     userService.authenticate(req.body.username, req.body.password)
@@ -98,7 +137,8 @@ function verifyToken(req,res){
     var userId = req.params.token
   userService.verifyToken(userId)
   .then(function () {
-      res.status(200).redirect('/login');
+      res.status(200)
+      res.redirect('/login');
   })
   .catch(function (err) {
       res.status(400).send(err);
@@ -118,12 +158,162 @@ userService.reset(userId)
 }
 
 function searchTitles(req,res){
-  var titlename= req.body.title
+  var titlename= req.query.title;
+  console.log(titlename);
   elastic.searchTitles(titlename)
-  .then(function () {
-      res.status(200);
+
+  .then(function (response) {
+      res.status(200).send(response);
+
+
   })
   .catch(function (err) {
       res.status(400).send(err);
   });
 }
+
+
+
+function serp(req,res){
+
+  res.render('SERP');
+
+}
+
+function initial(req,res){
+
+  res.render('initial');
+
+}
+
+function getTitle(req,res){
+  var id= req.params._id;
+  console.log(id);
+  elastic.getTitle(id)
+
+  .then(function (response) {
+    console.log(response)
+    var book = response.hits.hits[0]
+      console.log(book.title)
+      res.status(200).render("bookinfo",{bookinfo:book});
+      //.hits.hits[0]._source
+      //.render('bookinfo',{book:book })
+
+      //.send(response.hits.hits[0]._source);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+  });
+}
+
+function advsearch(req,res){
+
+var reqObj=req.body;
+elastic.advsearch(reqObj)
+
+.then(function (response) {
+    res.status(200).send(response);
+})
+.catch(function (err) {
+    res.status(400).send(err);
+});
+
+}
+
+function upload(req,res){
+
+  res.render("upload")
+
+}
+
+function create(req,res){
+  var reqobj=req.body;
+  console.log("user control");
+  console.log(reqobj);
+  elastic.createTitle(reqobj)
+
+  .then(function (response) {
+      res.status(200).send(response);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+  });
+
+
+}
+
+function comment(req,res){
+  var reqobj=req.body;
+  console.log("comment");
+  console.log(reqobj);
+  elastic.comment(reqobj)
+
+  .then(function (response) {
+      res.status(200).send(response);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+      console.log(err)
+  });
+}
+
+function like(req,res){
+  var reqobj=req.body;
+  console.log("like");
+  console.log(reqobj);
+  elastic.like(reqobj)
+
+  .then(function (response) {
+      res.status(200).send(response);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+      console.log(err)
+  });
+}
+
+function unlike(req,res){
+  var reqobj=req.body;
+  console.log("unlike");
+  console.log(reqobj);
+  elastic.unlike(reqobj)
+
+  .then(function (response) {
+      res.status(200).send(response);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+      console.log(err)
+  });
+}
+
+function newcomment(req,res){
+  var reqobj=req.body;
+  console.log("comment");
+  console.log(reqobj);
+  elastic.newcomment(reqobj)
+
+  .then(function (response) {
+      res.status(200).send(response);
+  })
+  .catch(function (err) {
+      res.status(400).send(err);
+  });
+}
+function favbook(req,res){
+
+  res.render('favbook');
+
+}
+// function bookinfo(req,res){
+//
+// res=req
+//
+//target="_self" .then(function (response) {
+//     res.status(200).send(response);
+// })
+// .catch(function (err) {
+//     res.status(400).send(err);
+// });
+//
+// }
